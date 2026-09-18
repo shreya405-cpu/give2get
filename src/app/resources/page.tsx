@@ -1,26 +1,29 @@
 "use client";
-import { useState } from "react";
-const resources = [
-  {
-    name: "Scientific Calculator",
-    category: "Electronics",
-    location: "Pune",
-  },
-  {
-    name: "Engineering Mathematics",
-    category: "Books",
-    location: "Pune",
-  },
-  {
-    name: "Drawing Kit",
-    category: "Study Items",
-    location: "Pune",
-  },
-];
-
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { Resource } from "@/types/resource";
 export default function Resources() {
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [resources, setResources] = useState<Resource[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
+    useEffect(() => {
+    const fetchResources = async () => {
+        const { data, error } = await supabase
+          .from("resources")
+          .select("*")
+          .returns<Resource[]>();
+
+        if (error) {
+            console.error("Error fetching resources:", error);
+            return;
+        }
+        
+
+        setResources(data);
+    };
+
+    fetchResources();
+}, []);
     const filteredResources = resources.filter((resource) => {
         const matchesCategory =
             selectedCategory === "All" ||
@@ -38,7 +41,7 @@ export default function Resources() {
           <p className="text-sm font-semibold uppercase tracking-widest text-zinc-500">
             Discover
           </p>
-
+          
           <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
             Find a resource
           </h1>
@@ -47,6 +50,11 @@ export default function Resources() {
             Find things you need from people in your community instead of
             buying something you may only use once.
           </p>
+
+          <a href="/share" className="mt-6 inline-block rounded-full bg-black px-6 py-3 text-sm font-medium text-white">
+            Share a Resource
+          </a>
+
 
           <div className="mt-8">
             <input
@@ -99,6 +107,11 @@ export default function Resources() {
                         <p className="mt-6 text-sm font-medium">
                            {resource.location}
                         </p>
+                        <a href={`/resources/${resource.name.toLowerCase().replaceAll(" ", "-")}`}
+                           className="mt-6 inline-block text-sm font-semibold"
+                        >
+                           View Details →
+                        </a>
                     </div>
                ))
             ) : (
