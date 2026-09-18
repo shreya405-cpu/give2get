@@ -101,13 +101,13 @@ export default function Resources() {
                         </h2>
 
                         <p className="mt-3 text-sm text-zinc-500">
-                           Available for borrowing
+                           {resource.status}
                         </p>
 
                         <p className="mt-6 text-sm font-medium">
                            {resource.location}
                         </p>
-                        <a href={`/resources/${resource.name.toLowerCase().replaceAll(" ", "-")}`}
+                        <a href={`/resources/${resource.id}`}
                            className="mt-6 inline-block text-sm font-semibold"
                         >
                            View Details →

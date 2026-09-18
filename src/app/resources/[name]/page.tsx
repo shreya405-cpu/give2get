@@ -9,13 +9,10 @@ export default async function ResourcePage({
 }) {
   const { name } = await params;
 
-  const resourceName = name.replaceAll("-", " ");
-  
-
-const { data: resource, error } = await supabase
+ const { data: resource, error } = await supabase
   .from("resources")
   .select("*")
-  .ilike("name", resourceName)
+  .eq("id", name)
   .single();
 
 if (error || !resource) {

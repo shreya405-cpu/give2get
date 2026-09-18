@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -8,6 +8,7 @@ export default function SharePage() {
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -24,6 +25,7 @@ export default function SharePage() {
       category: category,
       location: location,
       description: description,
+      status: "Available",
     },
   ]);
 
@@ -31,6 +33,9 @@ console.log("Supabase error:", error);
 
 console.log("Resource inserted successfully!");
 console.log("Supabase error:", error);
+if (!error) {
+  router.push("/resources");
+}
 
   console.log({
     resourceName,
