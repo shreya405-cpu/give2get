@@ -1,29 +1,37 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Resource } from "@/types/resource";
 export default function Resources() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [resources, setResources] = useState<Resource[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const router = useRouter();
     useEffect(() => {
-    const fetchResources = async () => {
-        const { data, error } = await supabase
-          .from("resources")
-          .select("*")
-          .returns<Resource[]>();
+  const checkUser = async () => {
+    const { data } = await supabase.auth.getUser();
 
-        if (error) {
-            console.error("Error fetching resources:", error);
-            return;
-        }
-        
+    if (!data.user) {
+      router.push("/login");
+      return;
+    }
 
-        setResources(data);
-    };
+    const { data: resources, error } = await supabase
+      .from("resources")
+      .select("*")
+      .returns<Resource[]>();
 
-    fetchResources();
-}, []);
+    if (error) {
+      console.error("Error fetching resources:", error);
+      return;
+    }
+
+    setResources(resources);
+  };
+
+  checkUser();
+}, [router]);
     const filteredResources = resources.filter((resource) => {
         const matchesCategory =
             selectedCategory === "All" ||
@@ -36,6 +44,15 @@ export default function Resources() {
    });
   return (
     <main className="min-h-screen bg-zinc-50 text-zinc-900">
+      <button
+        onClick={async () => {
+          await supabase.auth.signOut();
+          router.push("/login");
+        }}
+        className="rounded-lg border px-4 py-2 text-sm"
+      >
+        Log Out
+      </button>
       <section className="px-6 py-16 sm:px-10">
         <div className="mx-auto max-w-5xl">
           <p className="text-sm font-semibold uppercase tracking-widest text-zinc-500">

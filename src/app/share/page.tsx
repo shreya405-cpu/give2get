@@ -17,6 +17,12 @@ export default function SharePage() {
     alert("Please fill in all fields.");
     return;
   }
+  const { data: userData } = await supabase.auth.getUser();
+
+if (!userData.user) {
+  router.push("/login");
+  return;
+}
   const { error } = await supabase
   .from("resources")
   .insert([
@@ -26,13 +32,14 @@ export default function SharePage() {
       location: location,
       description: description,
       status: "Available",
+      owner_id: userData.user.id,
     },
   ]);
 
-console.log("Supabase error:", error);
+console.log("Supabase error:", error?.message);
 
 console.log("Resource inserted successfully!");
-console.log("Supabase error:", error);
+
 if (!error) {
   router.push("/resources");
 }
